@@ -1,30 +1,59 @@
-import { ActionSheetProvider, connectActionSheet } from '@expo/react-native-action-sheet'
+import * as Permissions from "expo-permissions";
+
 import {
   ApplicationProvider,
   IconRegistry,
   Layout
 } from "@ui-kitten/components";
-import { dark as darkTheme, mapping } from "@eva-design/eva";
+import { Constants, Notifications } from "expo";
 
+import { ActionSheetProvider } from "@expo/react-native-action-sheet";
 import { EvaIconsPack } from "@ui-kitten/eva-icons";
+import { IAppState } from "./components/types/App";
 import { NavBar } from "./components/ui/NavBar";
 import React from "react";
+import SafeAreaStyles from "./components/styles/SafeArea";
+import { SafeAreaView } from "react-native";
+import { mapping } from "@eva-design/eva";
+import theme from "./components/styles/theme";
 
-class App extends React.Component {
+class App extends React.Component<any, IAppState> {
   constructor(props) {
     super(props);
-    this.state = { loading: true, currentRoute: "search" };
+    this.state = { showTimePicker: false };
+    Permissions.getAsync(Permissions.NOTIFICATIONS).then(({ status }) => {
+      status === "undetermined"
+        ? Permissions.askAsync(Permissions.NOTIFICATIONS)
+        : status === "denied"
+        ? alert("Must Enable notifications")
+        : null;
+    });
   }
+
+  setNotificationInSeconds = time => {
+    Notifications.scheduleLocalNotificationAsync(
+      {
+        title: "You asked me to remind you",
+        body: "Uhh... rememeber eating fruits and vegatables"
+      },
+      { time }
+    );
+  };
 
   render() {
     return (
       <>
         <IconRegistry icons={EvaIconsPack} />
-        <ApplicationProvider mapping={mapping} theme={darkTheme}>
+        <ApplicationProvider mapping={mapping} theme={theme}>
           <ActionSheetProvider>
-            <Layout style={{ flex: 1 }}>
-              <NavBar addNewCallback={() => null} />
-            </Layout>
+            <SafeAreaView style={SafeAreaStyles}>
+              <Layout style={{ flex: 1 }}>
+                <NavBar
+                  addNewCallback={this.setNotificationInSeconds}
+                  requestServerNotification={() => null}
+                />
+              </Layout>
+            </SafeAreaView>
           </ActionSheetProvider>
         </ApplicationProvider>
       </>
@@ -32,13 +61,4 @@ class App extends React.Component {
   }
 }
 
-export default (App)
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     backgroundColor: '#fff',
-//     alignItems: 'center',
-//     justifyContent: 'center',
-//   },
-// });
+export default App;
