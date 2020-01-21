@@ -31,13 +31,14 @@ class App extends React.Component<any, IAppState> {
   }
 
   setNotificationInSeconds = time => {
+    console.log(time)
     Notifications.scheduleLocalNotificationAsync(
       {
         title: "You asked me to remind you",
-        body: "Uhh... rememeber eating fruits and vegatables"
+        body: "Uhh... rememeber eating fruits and vegetables"
       },
       { time }
-    );
+    ).then(console.log)
   };
 
   render() {

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Text, TopNavigation } from "@ui-kitten/components";
 
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import moment from "moment";
 import { useActionSheet } from "@expo/react-native-action-sheet";
 
 const options = [
@@ -15,15 +16,21 @@ export const NavBar = ({
   addNewCallback,
   requestServerNotification
 }: {
-  addNewCallback: (seconds: number) => void;
+  addNewCallback: (date: Date) => void;
   requestServerNotification: () => void;
 }) => {
   const [showPicker, setshowPicker] = useState(false);
   const { showActionSheetWithOptions } = useActionSheet();
 
   const confirmPickerTime = time => {
-    addNewCallback(time);
-    setshowPicker(false);
+    console.log(time, Date.now());
+    if (time > Date.now()) {
+      addNewCallback(time);
+
+      setshowPicker(false);
+    } else {
+      alert("Time must be in the future");
+    }
   };
   const cancelPickerTime = () => setshowPicker(false);
 
@@ -36,8 +43,12 @@ export const NavBar = ({
       buttonIndex => {
         switch (buttonIndex) {
           case 0:
-            const t = new Date();
-            addNewCallback(t.setSeconds(t.getSeconds() + 4));
+            const now = moment.now();
+            addNewCallback(
+              moment(now)
+                .add(15, "seconds")
+                .toDate()
+            );
             break;
           case 1:
             setshowPicker(true);
