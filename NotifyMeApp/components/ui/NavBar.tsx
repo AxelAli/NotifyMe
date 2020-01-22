@@ -23,7 +23,6 @@ export const NavBar = ({
   const { showActionSheetWithOptions } = useActionSheet();
 
   const confirmPickerTime = time => {
-    console.log(time, Date.now());
     if (time > Date.now()) {
       addNewCallback(time);
 
@@ -44,6 +43,7 @@ export const NavBar = ({
         switch (buttonIndex) {
           case 0:
             const now = moment.now();
+            console.log(moment(now), moment(now).add(15, "seconds"));
             addNewCallback(
               moment(now)
                 .add(15, "seconds")
@@ -66,13 +66,15 @@ export const NavBar = ({
         alignment="center"
         rightControls={<Text onPress={createNewNotification}>Add New</Text>}
       />
-      <DateTimePickerModal
-        headerTextIOS="Pick a time"
-        isVisible={showPicker}
-        mode="time"
-        onConfirm={confirmPickerTime}
-        onCancel={cancelPickerTime}
-      />
+      {showPicker && (
+        <DateTimePickerModal
+          headerTextIOS="Pick a time"
+          isVisible
+          mode="time"
+          onConfirm={confirmPickerTime}
+          onCancel={cancelPickerTime}
+        />
+      )}
     </>
   );
 };
